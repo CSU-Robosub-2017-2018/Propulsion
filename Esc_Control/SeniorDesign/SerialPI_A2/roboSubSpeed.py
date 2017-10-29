@@ -66,12 +66,6 @@ class Speed:
             self.arm()
         self.update(0,1500,1500)
 
-class SpeedDriver:
-
-    x = [1500,1500]
-    y = [1500,1500]
-    z = [1500,1500]
-
     
 
     
