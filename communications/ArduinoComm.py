@@ -1,12 +1,14 @@
-import serial
-from threading import Timer
-from time import sleep
-
 try:
     import RPi.GPIO as GPIO
+    import serial
+    from threading import Timer
+    from time import sleep
 except:
-    from rpidevmocks import MockGPIO
+    import tests.serial as serial
+    from tests.rpidevmocks import MockGPIO
     GPIO = MockGPIO()
+    from threading import Timer
+    from time import sleep
 
 class ArduinoComm:
 
@@ -19,7 +21,7 @@ class ArduinoComm:
     hardULimit = 2000
     hardLLimit = 1000
 
-    updateRate = 0.001 #rate in seconds
+    updateRate = 0.2 #rate in seconds
 
     armed = False
     error = False
@@ -32,13 +34,15 @@ class ArduinoComm:
         except:
             print("ERROR: Cannot connect to serial port!")
             exit(1)
-        GPIO.setmode(GPIO.BCM)
-        # GPIO gpioPin set up as an input, pulled down, connected to 3V3 on error
-        GPIO.setup(self.gpioPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        # when a rising edge is detected on port gpioPin, regardless of whatever
-        # else is happening in the program, the function clearError will be run
-        GPIO.add_event_detect(self.gpioPin,GPIO.RISING,callback=self.error,bouncetime=300)
-        #print("ERROR: Cannot setup GPIO Interrupt!")
+        try:
+            GPIO.setmode(GPIO.BCM)
+            # GPIO gpioPin set up as an input, pulled down, connected to 3V3 on error
+            GPIO.setup(self.gpioPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+            # when a rising edge is detected on port gpioPin, regardless of whatever
+            # else is happening in the program, the function clearError will be run
+            GPIO.add_event_detect(self.gpioPin,GPIO.RISING,callback=self.error,bouncetime=300)
+        except:
+            print("ERROR: Cannot setup GPIO Interrupt!")
 
 
     def initESC(self):
