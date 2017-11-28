@@ -1,14 +1,13 @@
 try:
     import RPi.GPIO as GPIO
     import serial
-    from threading import Timer
-    from time import sleep
 except:
     import tests.serial as serial
     from tests.rpidevmocks import MockGPIO
     GPIO = MockGPIO()
-    from threading import Timer
-    from time import sleep
+    computer = True
+from threading import Timer
+from time import sleep
 
 class ArduinoComm:
 
@@ -47,7 +46,7 @@ class ArduinoComm:
 
     def initESC(self):
         #FIXME: write esc initialization
-        self.debug = false
+        self.debug = False
         
     def getArmed(self):
         return self.armed
@@ -66,9 +65,9 @@ class ArduinoComm:
                                         if self.debug:
                                             print("WARNING: input exceeded lower limit")
             self.speeds = newSpeeds
-            #returnVal = ",".join(str(e) for e in self.speeds)
-            #self.ser.write(returnVal.encode())
-            #print("write: " + returnVal)
+            returnVal = ",".join(str(e) for e in self.speeds)
+            self.ser.write(returnVal.encode())
+            print("write: " + returnVal)
         else:
             print("ERROR: cannot write while motors are not armed.")
 
@@ -91,10 +90,12 @@ class ArduinoComm:
 
     def disarm(self):
         self.ser.write("0".encode())
+        self.write([1500,1500,1500,1500,1500,1500])
+        self.armed = False
         if self.debug:
             print("disarmed")
-            #self.ser.getCount() #testing off of arduino with custom serial class
-        self.armed = False
+            if computer:
+                self.ser.getCount() #testing off of arduino with custom serial class
 
     def getSpeed(self):
         return self.speeds
