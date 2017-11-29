@@ -28,7 +28,7 @@ class ArduinoComm:
 
     gpioPin = 18 #FIXME get a good gpio pin
 
-    def __init__(self):
+    def __init__(self, update):
         try:
             self.ser = serial.Serial("/dev/ttyACM0", 9600)
         except:
