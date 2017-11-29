@@ -2,6 +2,8 @@ from time import sleep
 from communications.ArduinoComm import ArduinoComm
 
 a = ArduinoComm()
+s = SubControl(a)
+
 
 try:
     while True:

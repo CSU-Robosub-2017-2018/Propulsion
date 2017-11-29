@@ -31,9 +31,9 @@ class ArduinoComm:
         self.armed = False
         self.speeds = [self.deadBand] * 6 #Motor uSecond values: [x1,x2,y1,y2,z1,z2]
         try:
-            self.ser = serial.Serial("/dev/ttyACM0", 9600)
+            self.ser = serial.Serial("/dev/ttyACM0", 19200)
         except:
-            print("ERROR: Cannot connect to serial port!")
+            print("ERROR: ArduinoComm: Cannot connect to serial port!")
             exit(1)
         try:
             GPIO.setmode(GPIO.BCM)
@@ -43,7 +43,7 @@ class ArduinoComm:
             # else is happening in the program, the function clearError will be run
             GPIO.add_event_detect(self.errorGpioPin, GPIO.RISING, callback=self.error, bouncetime=300)
         except:
-            print("ERROR: Cannot setup GPIO Interrupt!")
+            print("ERROR: ArduinoComm: Cannot setup GPIO Interrupt!")
 
 
     def initESC(self):
@@ -55,7 +55,7 @@ class ArduinoComm:
 
     def writeMicroSeconds(self, newSpeeds):
         if len(newSpeeds) != len(self.speeds):
-            print("WARNING: new speed arrays lengths don't match")
+            print("WARNING: ArduinoComm: new speed arrays lengths don't match")
         elif self.armed:
             for e in range(0, len(self.speeds)):
                                 if newSpeeds[e] > self.Uplimit:
@@ -69,15 +69,15 @@ class ArduinoComm:
             self.speeds = newSpeeds
             returnVal = ",".join(str(e) for e in self.speeds)
             self.ser.write(returnVal.encode())
-            print("write: " + returnVal)
+            print("ArdiunoComm: Write: " + returnVal)
         else:
-            print("ERROR: cannot write while motors are not armed.")
+            print("ERROR: ArduinoComm: cannot write while motors are not armed.")
 
     def updateMicroSeconds(self):
         if not self.armed:
-            print("WARNING: not armed, cannot update")
+            print("WARNING: ArduinoComm: not armed, cannot update")
         elif not self.update:
-            print("WARNING: update was not set to TRUE, cannot update")
+            print("WARNING: ArduinoComm: update was not set to TRUE, cannot update")
         else:
             returnVal = ",".join(str(e) for e in self.speeds)
             self.ser.write(returnVal.encode())
@@ -88,25 +88,34 @@ class ArduinoComm:
     def arm(self):
         self.ser.write("1".encode())
         if self.debug:
-            print("armed")
+            print("ARMED")
         self.armed = True
         self.updateMicroSeconds()
 
     def disarm(self):
         self.ser.write("0".encode())
         if self.debug:
-            print("disarmed")
+            print("DISARMED")
             #self.ser.getCount() #testing off of arduino with custom serial class
         self.armed = False
 
     def getSpeed(self):
         return self.speeds
 
+    def getDeadBand(self):
+        return self.deadBand
+
+    def getUpLimit(self):
+        return self.Uplimit
+
+    def getLowLimit(self):
+        return self.Lowlimit
+
     def error(self, extra):
         #FIXME: handle errors
         if self.debug:
-            print("error detected")
-        self.write([1500,1500,1500,1500,1500,1500])
+            print("ArduinoComm: Error Detected")
+        self.write([deadBand] * 6)
         self.armed = False
         self.error = True
         self.ser.write("2".encode())
