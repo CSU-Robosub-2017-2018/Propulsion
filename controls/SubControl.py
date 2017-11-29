@@ -5,15 +5,17 @@ class SubControl:
 
     debug = False;
 
-    def __init__(self, init_target=[0] * 29):
+    updateRate = 0.2 #rate in seconds
+
+    def __init__(self, init_target=[0] * 29, update=True):
+        self.update = update
         self.target = init_target
         try:
-            arduinoComm = ArduinoComm()
+            self.arduinoComm = ArduinoComm()
         except:
-            print("ERROR: Cannot establish Arduino Communicaitons.")
+            print("ERROR: Cannot establish Arduino Communications.")
             exit(1)
-        updateMotors();
+        self.updateMotors()
 
-
-
-
+    def updateMotors(self):
+        #FIXME write update motors system.
