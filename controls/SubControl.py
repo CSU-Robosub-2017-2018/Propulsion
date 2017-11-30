@@ -24,7 +24,7 @@ class SubControl:
         try:
             self.sensory = getSensoryData()
         except:
-            print("ERROR: Cannot get establish Sensory")
+            print("ERROR: Cannot establish Sensory")
             exit(1)
 
         self.updateMotors()
@@ -42,7 +42,7 @@ class SubControl:
             Timer(self.updateRate,self.updateMotors).start() #makes new thread that calls updateMotors every updateRate seconds
 
     def getDifference(self):
-        # x,y,z will be values 0-180 representing the degree difference between the target and the recieved infromation from IMU.
+        # x,y,z will be values (+/-)0-180 representing the degree difference between the target and the recieved infromation from IMU.
         x = 0
         y = 0
         z = 0
